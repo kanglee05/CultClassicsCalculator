@@ -1,16 +1,88 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import './App.css'
 
-function Calculator() {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [genre, setGenre] = useState('');
-  const [runtime, setRuntime] = useState('');
-  const [tagline, setTagline] = useState('');
+interface FormData {
+  title: string;
+  runtime: number;
+  tagline: string;
+  description: string;
+  genre: string;
+}
 
-  const handleSubmit = () => {
-    console.log({ title, description, genre, runtime, tagline });
+interface Factor {
+  score: number;
+  weight: number;
+  details: string;
+}
+
+interface Results {
+  probability: number;
+  factors: {
+    runtime: Factor;
+    genre: Factor;
+    tagline: Factor;
+    description: Factor;
+  };
+  movie_details: FormData;
+}
+
+function Calculator() {
+  const [formData, setFormData] = useState<FormData>({
+    title: '',
+    runtime: 120,
+    tagline: '',
+    description: '',
+    genre: 'Action'
+  });
+  const [results, setResults] = useState<Results | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    // Mock results
+    const mockResults: Results = {
+      probability: 75.5,
+      factors: {
+        runtime: {
+          score: 70,
+          weight: 20,
+          details: "Good runtime for cult potential"
+        },
+        genre: {
+          score: 90,
+          weight: 25,
+          details: "High cult potential genre"
+        },
+        tagline: {
+          score: 85,
+          weight: 25,
+          details: "Strong, memorable tagline"
+        },
+        description: {
+          score: 75,
+          weight: 30,
+          details: "Interesting description"
+        }
+      },
+      movie_details: formData
+    };
+
+    // Simulate API call
+    setTimeout(() => {
+      setResults(mockResults);
+      setIsSubmitting(false);
+    }, 1000);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: name === 'runtime' ? Number(value) : value
+    }));
   };
 
   return (
@@ -20,55 +92,21 @@ function Calculator() {
         <Link to="/info" className="nav-link">About</Link>
       </div>
       
-      <h1 className="form-title">CULT CLASSIC CLUB</h1>
+      <h1 className="form-title">CULT CLASSIC CALCULATOR</h1>
+      <h2 className="form-subtitle">How likely is your movie to become a cult classic?</h2>
 
       <div className="form-section">
-        <h2 className="section-title">Movie Details</h2>
         
         <div className="form-group">
           <label className="form-label" htmlFor="title">Movie Title</label>
           <input
             id="title"
             type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            value={formData.title}
+            onChange={handleInputChange}
             placeholder="Enter the movie title"
             className="form-input"
-          />
-        </div>
-
-        <div className="form-group">
-          <label className="form-label" htmlFor="tagline">Tagline</label>
-          <input
-            id="tagline"
-            type="text"
-            value={tagline}
-            onChange={(e) => setTagline(e.target.value)}
-            placeholder="Enter the movie's tagline"
-            className="form-input"
-          />
-        </div>
-
-        <div className="form-group">
-          <label className="form-label" htmlFor="description">Description</label>
-          <textarea
-            id="description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Enter a brief description of the movie"
-            className="form-textarea"
-          />
-        </div>
-
-        <div className="form-group">
-          <label className="form-label" htmlFor="genre">Genre</label>
-          <input
-            id="genre"
-            type="text"
-            value={genre}
-            onChange={(e) => setGenre(e.target.value)}
-            placeholder="e.g., Horror, Comedy, Drama"
-            className="form-input"
+            name="title"
           />
         </div>
 
@@ -77,20 +115,109 @@ function Calculator() {
           <input
             id="runtime"
             type="number"
-            value={runtime}
-            onChange={(e) => setRuntime(e.target.value)}
+            value={formData.runtime}
+            onChange={handleInputChange}
             placeholder="Enter runtime in minutes"
             className="form-input"
+            name="runtime"
+            min="30"
+            max="300"
           />
         </div>
+
+        <div className="form-group">
+          <label className="form-label" htmlFor="genre">Genre</label>
+          <select
+            id="genre"
+            value={formData.genre}
+            onChange={handleInputChange}
+            className="form-input"
+            name="genre"
+          >
+            <option value="Action">Action</option>
+            <option value="Comedy">Comedy</option>
+            <option value="Drama">Drama</option>
+            <option value="Horror">Horror</option>
+            <option value="Sci-Fi">Sci-Fi</option>
+            <option value="Fantasy">Fantasy</option>
+            <option value="Thriller">Thriller</option>
+            <option value="Romance">Romance</option>
+            <option value="Animation">Animation</option>
+            <option value="Documentary">Documentary</option>
+          </select>
+        </div>
+
+
+      <div className="form-group">
+          <label className="form-label" htmlFor="tagline">Tagline</label>
+          <input
+            id="tagline"
+            type="text"
+            value={formData.tagline}
+            onChange={handleInputChange}
+            placeholder="Enter the movie's tagline"
+            className="form-input"
+            name="tagline"
+          />
+        </div>
+
       </div>
+
+      <div className="form-group">
+          <label className="form-label" htmlFor="description">Description</label>
+          <textarea
+            id="description"
+            value={formData.description}
+            onChange={handleInputChange}
+            placeholder="Enter a brief description of the movie"
+            className="form-textarea"
+            name="description"
+          />
+        </div>
 
       <button 
         onClick={handleSubmit} 
         className="form-button form-button-primary"
+        disabled={isSubmitting}
       >
-        Calculate Cult Classic Score
+        {isSubmitting ? 'Calculating...' : 'Calculate Cult Classic Score'}
       </button>
+
+      {results && (
+        <div className="results-container">
+          <h2 className="section-title">Results</h2>
+          <div className="results-content">
+            <div className="probability-display">
+              <h3>Cult Classic Probability</h3>
+              <div className="probability-value">{results.probability}%</div>
+            </div>
+
+            <div className="movie-details">
+              <h3>Movie Details</h3>
+              <div className="detail-item">
+                <span className="detail-label">Title:</span>
+                <span className="detail-value">{results.movie_details.title}</span>
+              </div>
+              <div className="detail-item">
+                <span className="detail-label">Runtime:</span>
+                <span className="detail-value">{results.movie_details.runtime} minutes</span>
+              </div>
+              <div className="detail-item">
+                <span className="detail-label">Genre:</span>
+                <span className="detail-value">{results.movie_details.genre}</span>
+              </div>
+              <div className="detail-item">
+                <span className="detail-label">Tagline:</span>
+                <span className="detail-value">"{results.movie_details.tagline}"</span>
+              </div>
+              <div className="detail-item">
+                <span className="detail-label">Description:</span>
+                <span className="detail-value">"{results.movie_details.description}"</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -143,6 +270,8 @@ function Info() {
           on historical patterns and cultural indicators.
         </p>
       </div>
+
+      
     </div>
   );
 }

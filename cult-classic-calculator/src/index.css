@@ -58,7 +58,7 @@ p, li {
 }
 
 .form-container {
-  max-width: 600px;
+  max-width: 65vw;
   margin: 0 auto;
   padding: 2rem;
   background-color: #363636;
@@ -69,14 +69,26 @@ p, li {
 
 .form-title {
   font-size: 3rem;
-  margin-bottom: 2rem;
   color: #ffffff;
   text-align: center;
   letter-spacing: 0.05em;
+  margin-bottom: 0;
+}
+
+.form-subtitle {
+  font-size: 1.2rem;
+  font-style: italic;
+  color: #ffffff;
+  text-align: center;
+  margin: 0;
+  margin-bottom: 1rem;
 }
 
 .form-section {
   margin-bottom: 2rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
 }
 
 .section-title {
@@ -97,7 +109,7 @@ p, li {
 }
 
 .form-input {
-  width: 90%;
+  width: 80%;
   padding: 0.75rem;
   border: 1px solid #555;
   border-radius: 4px;
@@ -189,4 +201,161 @@ select.form-input {
   margin-bottom: 0.5rem;
   color: #e0e0e0;
   font-size: 1.1rem;
+}
+
+.calculator-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.results-container {
+  background-color: #363636;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border: 1px solid #444;
+  margin-top: 2rem;
+}
+
+.results-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.probability-display {
+  text-align: center;
+  padding: 2rem;
+  background-color: #404040;
+  border-radius: 8px;
+  border: 2px solid #ff3333;
+}
+
+.probability-display h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #ffffff;
+}
+
+.probability-value {
+  font-size: 4rem;
+  font-weight: bold;
+  color: #ff3333;
+  text-shadow: 0 0 10px rgba(255, 51, 51, 0.3);
+}
+
+.movie-details {
+  background-color: #404040;
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+
+.movie-details h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #ffffff;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #555;
+}
+
+.detail-item:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  color: #e0e0e0;
+  font-size: 1.1rem;
+}
+
+.detail-value {
+  color: #ffffff;
+  font-size: 1.1rem;
+}
+
+.factors-analysis {
+  background-color: #404040;
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+
+.factors-analysis h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #ffffff;
+}
+
+.factor-item {
+  background-color: #363636;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.factor-item:last-child {
+  margin-bottom: 0;
+}
+
+.factor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.factor-name {
+  color: #ffffff;
+  font-size: 1.2rem;
+  text-transform: capitalize;
+}
+
+.factor-score {
+  color: #ff3333;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.factor-weight {
+  color: #e0e0e0;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.factor-details {
+  color: #e0e0e0;
+  font-size: 1rem;
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .calculator-container {
+    padding: 0;
+  }
+
+  .results-container {
+    padding: 1rem;
+  }
+
+  .probability-value {
+    font-size: 3rem;
+  }
+
+  .detail-item {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .factor-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
 }
