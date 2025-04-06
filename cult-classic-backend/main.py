@@ -3,9 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
 import pandas as pd
+import pickle
 
 app = FastAPI(title="Cult Classic Calculator API")
-
+with open('tree_model.sav', 'rb') as file:
+    model = pickle.load(file)
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
@@ -43,7 +45,6 @@ class MovieData(BaseModel):
 
         return df
 
-
 @app.get("/")
 async def root():
     # TODO: get all info from user input
@@ -52,12 +53,10 @@ async def root():
 @app.post("/calculate")
 async def calculate_cult_probability(movie: MovieData):
     # TODO: implement cult classic probability calculation logic
+    data = movie.get_df()
+    score = model.predict(data)[0]
 
-
-
-    return {
-        
-    }
+    return score
 
 if __name__ == "__main__":
     import uvicorn
