@@ -16,6 +16,10 @@ body {
   padding: 2rem;
 }
 
+p, li {
+  font-family: Georgia, 'Times New Roman', Times, serif
+}
+
 .nav-links {
   display: flex;
   justify-content: center;

@@ -126,14 +126,13 @@ function Info() {
            <br></br><br></br>
            Below are the factors we considered when labeling the movies:
 
+        {/* TODO: These should be updated to match our values*/}
         </p>
         <ul>
           <li>Movie Overview</li>
-          <li></li>
-          <li>Runtime and pacing</li>
-          <li>Narrative complexity and themes</li>
-          <li>Cultural and social impact</li>
-          <li>Fan engagement potential</li>
+          <li>Date of Release</li>
+          <li>Runtime</li>
+          <li>Genre(s)</li>
         </ul>
 
         <h2 className="section-title">How It Works</h2>
