@@ -6,8 +6,7 @@ import pandas as pd
 import pickle
 
 app = FastAPI(title="Cult Classic Calculator API")
-with open('tree_model.sav', 'rb') as file:
-    model = pickle.load(file)
+
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
@@ -53,6 +52,8 @@ async def root():
 @app.post("/calculate")
 async def calculate_cult_probability(movie: MovieData):
     # TODO: implement cult classic probability calculation logic
+    with open('tree_model.sav', 'rb') as file:
+        model = pickle.load(file)
     data = movie.get_df()
     score = model.predict(data)[0]
 
