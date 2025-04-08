@@ -4,14 +4,16 @@ from pydantic import BaseModel
 from typing import Optional
 import pandas as pd
 import pickle
-
+import shap
 app = FastAPI(title="Cult Classic Calculator API")
+
 with open('tree_model.sav', 'rb') as file:
     model = pickle.load(file)
+    
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # React development server
+    allow_origins=["http://localhost:5173"],  # React development server
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -52,11 +54,47 @@ async def root():
 
 @app.post("/calculate")
 async def calculate_cult_probability(movie: MovieData):
-    # TODO: implement cult classic probability calculation logic
+   
     data = movie.get_df()
-    score = model.predict(data)[0]
 
-    return score
+    # Get feature importances (global weights)
+    feature_names = data.columns.tolist()
+    importances = model.feature_importances_
+    feature_weights = dict(zip(feature_names, importances))
+
+    # Predict class and probability
+    prediction = model.predict(data)[0]
+    proba = model.predict_proba(data)[0]
+    confidence = proba[1]
+
+    # SHAP: get per-feature contributions for this sample
+    explainer = shap.TreeExplainer(model)
+    shap_values = explainer.shap_values(data)
+
+    # Fix: safely handle shap_values shape
+    if isinstance(shap_values, list):
+        individual_contributions = shap_values[prediction][0]  # use the predicted class
+    else:
+        individual_contributions = shap_values[0]  # fallback
+
+    # Map to feature names
+    per_feature_scores = dict(zip(data.columns, individual_contributions))
+
+    # Format results as expected
+    factors = {}
+    for feature, weight in feature_weights.items():
+        score = per_feature_scores.get(feature, 0)
+        factors[feature] = {
+            "score": round(score[0] * 100, 2),   # convert to % for UI
+            "weight": round(weight * 100, 2),
+            "details": f"Impact of {feature} on cult classification"
+        }
+
+    return {
+        "probability": round(confidence * 100, 2),
+        "factors": factors,
+        "movie_details": movie.model_dump()
+    }
 
 if __name__ == "__main__":
     import uvicorn

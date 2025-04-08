@@ -18,7 +18,9 @@ from transformers import BertForSequenceClassification, BertConfig, BertTokenize
 from torch.utils.data import DataLoader, Dataset
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 from sklearn.model_selection import train_test_split
-
+from fuzzywuzzy import fuzz
+from fuzzywuzzy import process
+import re
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(device)
@@ -65,29 +67,30 @@ def build_cult_names():
 
 # Retrieves the cult names
 # Picks
-def get_cult_names(refresh = False):
-  filename = "cc_names.txt"
-  cc_file = Path(filename)
-  cult_names = None
+def get_cult_names(refresh=False):
+    filename = "cc_names.txt"
+    cc_file = Path(filename)
 
-  # Pull from cache
-  if cc_file.is_file() and not refresh:
-    f = open(filename, "r")
-    cult_names = f.read().split("\n")
+    if cc_file.is_file() and not refresh:
+        with open(filename, "r", encoding="utf-8") as f:
+            cult_names = [line.strip() for line in f if line.strip()]
+    else:
+        cult_names = build_cult_names()
+        if not cult_names:
+            raise Exception("Scraping failed — not saving an empty cult_names list.")
+        with open(filename, "w", encoding="utf-8") as f:
+            f.write("\n".join(cult_names))
 
-  else:
-    cult_names = build_cult_names()
-    f = open(filename, "a")
-    f.write("\n".join(cult_names).encode('utf8'))
-    f.close()
-
-  return cult_names
+    return cult_names
 
 cult_names = get_cult_names()
-
+cult_names = [name for name in cult_names if name.strip() != '']
 # Add a column indicating whether a film is a cult film or not
 mask = cult_df['title'].isin(cult_names)
 cult_df['cult'] = mask.astype(int)
+print("✅ Cult classic count:", cult_df['cult'].sum())
+
+
 
 # Drop all duplicates (really, this should be done earlier)
 clean_df = cult_df.drop_duplicates(subset='title')
@@ -115,6 +118,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import FunctionTransformer, OneHotEncoder, Binarizer
 from sklearn.compose import make_column_transformer
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn import tree
 import matplotlib.pyplot as plt
 
@@ -129,11 +133,26 @@ for genre in genre_list:
   features_df[genre] = features_df['genres'].fillna('Genreless').str.contains(genre).astype(int)
 
 features_df.head()
-
-x_train, x_test, y_train, y_test = train_test_split(features_df[reg_cols + list(genre_list)], features_df['cult'], test_size=0.2, random_state=42)
+print(features_df['cult'].value_counts())
+x_train, x_test, y_train, y_test = train_test_split(
+    features_df[reg_cols + list(genre_list)],
+    features_df['cult'],
+    test_size=0.2,
+    random_state=42,
+    stratify=features_df['cult']
+)
 
 clf = tree.DecisionTreeClassifier(max_depth=4)
 clf = clf.fit(x_train, y_train)
 
+y_pred = clf.predict(x_test)
+
+print("Accuracy:", accuracy_score(y_test, y_pred))
+print("Precision:", precision_score(y_test, y_pred))
+print("Recall:", recall_score(y_test, y_pred))
+print("F1 Score:", f1_score(y_test, y_pred))
+
 filename = 'tree_model.sav'
 pickle.dump(clf, open(filename, 'wb'))
+
+
