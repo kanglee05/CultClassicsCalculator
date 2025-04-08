@@ -7,12 +7,9 @@ import pickle
 import shap
 app = FastAPI(title="Cult Classic Calculator API")
 
-<<<<<<< HEAD
 with open('tree_model.sav', 'rb') as file:
     model = pickle.load(file)
     
-=======
->>>>>>> c246d85b10d1521e04a8e37ad292acf686cc7a65
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
@@ -57,13 +54,6 @@ async def root():
 
 @app.post("/calculate")
 async def calculate_cult_probability(movie: MovieData):
-<<<<<<< HEAD
-   
-=======
-    # TODO: implement cult classic probability calculation logic
-    with open('tree_model.sav', 'rb') as file:
-        model = pickle.load(file)
->>>>>>> c246d85b10d1521e04a8e37ad292acf686cc7a65
     data = movie.get_df()
 
     # Get feature importances (global weights)
