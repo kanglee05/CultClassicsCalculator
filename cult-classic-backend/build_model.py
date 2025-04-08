@@ -88,7 +88,7 @@ cult_names = [name for name in cult_names if name.strip() != '']
 # Add a column indicating whether a film is a cult film or not
 mask = cult_df['title'].isin(cult_names)
 cult_df['cult'] = mask.astype(int)
-print("✅ Cult classic count:", cult_df['cult'].sum())
+print("Cult classic count:", cult_df['cult'].sum())
 
 
 
